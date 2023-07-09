@@ -23,15 +23,15 @@ struct wspp_client;
 
 typedef unsigned long long wspp_connection;
 
-typedef void (*on_open)(wspp_server*, wspp_connection);
-typedef void (*on_close)(wspp_server*, wspp_connection);
-typedef void (*on_message_server)(wspp_server*, wspp_connection, char*, long long);
+typedef void (*on_open)(wspp_server* server, wspp_connection connection);
+typedef void (*on_close)(wspp_server* server, wspp_connection connection);
+typedef void (*on_message_server)(wspp_server* server, wspp_connection connection, char* data, long long length);
 
 struct wspp_server {
     websocketpp::server<websocketpp::config::asio> server;
 };
 
-typedef void (*on_message_client)(wspp_client*, char*, long long);
+typedef void (*on_message_client)(wspp_client* client, char* data, long long length);
 
 struct wspp_client {
     websocketpp::client<websocketpp::config::asio_client> client;
@@ -71,81 +71,81 @@ enum wspp_close_type {
 
 EXPORT wspp_server* wspp_server_create();
 
-EXPORT void wspp_server_free(wspp_server*);
+EXPORT void wspp_server_free(wspp_server* server);
 
-EXPORT void wspp_server_set_open_handler(wspp_server*, on_open);
+EXPORT void wspp_server_set_open_handler(wspp_server* server, on_open handler);
 
-EXPORT void wspp_server_set_close_handler(wspp_server*, on_close);
+EXPORT void wspp_server_set_close_handler(wspp_server* server, on_close handler);
 
-EXPORT void wspp_server_set_message_handler(wspp_server*, on_message_server);
+EXPORT void wspp_server_set_message_handler(wspp_server* server, on_message_server handler);
 
 // begin listening and accepting connections on a port
-EXPORT void wspp_server_listen(wspp_server*, long long);
+EXPORT void wspp_server_listen(wspp_server* server, long long port);
 
-EXPORT void wspp_server_stop_listening(wspp_server*);
+EXPORT void wspp_server_stop_listening(wspp_server* server);
 
-EXPORT bool wspp_server_is_listening(wspp_server*);
+EXPORT bool wspp_server_is_listening(wspp_server* server);
 
 // makes the server continuously synchronously listen
-EXPORT void wspp_server_run(wspp_server*);
+EXPORT void wspp_server_run(wspp_server* server);
 
 // makes the server synchronously listen for a single io event
-EXPORT void wspp_server_run_one(wspp_server*);
+EXPORT void wspp_server_run_one(wspp_server* server);
 
 // makes the server process all currently queued io events and then returns
-EXPORT void wspp_server_poll(wspp_server*);
+EXPORT void wspp_server_poll(wspp_server* server);
 
 // makes the server process a single currently queued io event and then returns
-EXPORT void wspp_server_poll_one(wspp_server*);
+EXPORT void wspp_server_poll_one(wspp_server* server);
 
-EXPORT void wspp_server_stop(wspp_server*);
+EXPORT void wspp_server_stop(wspp_server* server);
 
-EXPORT bool wspp_server_is_stopped(wspp_server*);
+EXPORT bool wspp_server_is_stopped(wspp_server* server);
 
-EXPORT void wspp_server_start_perpetual(wspp_server*);
+EXPORT void wspp_server_start_perpetual(wspp_server* server);
 
 // stops the server once all connections have been dropped
-EXPORT void wspp_server_stop_perpetual(wspp_server*);
+EXPORT void wspp_server_stop_perpetual(wspp_server* server);
 
 // send to all?
 
-EXPORT bool wspp_server_send(wspp_connection, char*, long long, wspp_message_type);
+EXPORT bool wspp_server_send(wspp_connection connection, char* data, long long length, wspp_message_type op);
 
-EXPORT bool wspp_server_close(wspp_connection, wspp_close_type, char*, long long);
+EXPORT bool wspp_server_close(wspp_connection connection, wspp_close_type code, char* reason_data, long long reason_length);
 
 
 
 EXPORT wspp_client* wspp_client_create();
 
-EXPORT void wspp_client_free(wspp_client*);
+EXPORT void wspp_client_free(wspp_client* client);
 
-EXPORT void wspp_client_set_message_handler(wspp_client*, on_message_client);
+EXPORT void wspp_client_set_message_handler(wspp_client* client, on_message_client handler);
 
-EXPORT bool wspp_client_connect(wspp_client*, char*, long long);
+EXPORT bool wspp_client_connect(wspp_client* client, char* data, long long length);
 
-EXPORT void wspp_client_stop_listening(wspp_client*);
+EXPORT void wspp_client_stop_listening(wspp_client* client);
 
-EXPORT bool wspp_client_is_listening(wspp_client*);
+EXPORT bool wspp_client_is_listening(wspp_client* client);
 
-EXPORT void wspp_client_run(wspp_client*);
+EXPORT void wspp_client_run(wspp_client* client);
 
-EXPORT void wspp_client_run_one(wspp_client*);
+EXPORT void wspp_client_run_one(wspp_client* client);
 
-EXPORT void wspp_client_poll(wspp_client*);
+EXPORT void wspp_client_poll(wspp_client* client);
 
-EXPORT void wspp_client_poll_one(wspp_client*);
+EXPORT void wspp_client_poll_one(wspp_client* client);
 
-EXPORT void wspp_client_stop(wspp_client*);
+EXPORT void wspp_client_stop(wspp_client* client);
 
-EXPORT bool wspp_client_is_stopped(wspp_client*);
+EXPORT bool wspp_client_is_stopped(wspp_client* client);
 
-EXPORT void wspp_client_start_perpetual(wspp_client*);
+EXPORT void wspp_client_start_perpetual(wspp_client* client);
 
-EXPORT void wspp_client_stop_perpetual(wspp_client*);
+EXPORT void wspp_client_stop_perpetual(wspp_client* client);
 
-EXPORT bool wspp_client_send(wspp_client*, char*, long long, wspp_message_type);
+EXPORT bool wspp_client_send(wspp_client* client, char* data, long long length, wspp_message_type op);
 
-EXPORT bool wspp_client_close(wspp_client*, wspp_close_type, char*, long long);
+EXPORT bool wspp_client_close(wspp_client* client, wspp_close_type code, char* reason_data, long long reason_length);
 
 }
 

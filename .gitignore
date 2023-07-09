@@ -1,2 +1,3 @@
-export/cmake-*
+cmake-*
 .idea/
+.build/

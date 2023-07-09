@@ -37,8 +37,8 @@ void wspp_server_set_message_handler(wspp_server* server, on_message_server hand
     server->server.set_message_handler([server, handler](websocketpp::connection_hdl handle, websocketpp::server<websocketpp::config::asio>::message_ptr msg) {
         unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
 
-        std::string& payload = const_cast<std::string&>(msg->get_payload());
-        char* data = payload.data();
+        const std::string& payload = msg->get_payload();
+        char* data = const_cast<char*>(payload.data());
         long long length = payload.size();
 
         handler(server, identifier, data, length);
@@ -131,8 +131,8 @@ void wspp_client_free(wspp_client* client) {
 
 void wspp_client_set_message_handler(wspp_client* client, on_message_client handler) {
     client->client.set_message_handler([client, handler](websocketpp::connection_hdl handle, websocketpp::server<websocketpp::config::asio_client>::message_ptr msg) {
-        std::string& payload = const_cast<std::string&>(msg->get_payload());
-        char* data = payload.data();
+        const std::string& payload = msg->get_payload();
+        char* data = const_cast<char*>(payload.data());
         long long length = payload.size();
 
         handler(client, data, length);
