@@ -8,18 +8,20 @@
 
 wspp_connection :: u64;
 
-on_open :: #type (server: *wspp_server, connection: wspp_connection) -> void #c_call;
-on_close :: #type (server: *wspp_server, connection: wspp_connection) -> void #c_call;
+on_open_server :: #type (server: *wspp_server, connection: wspp_connection) -> void #c_call;
+on_close_server :: #type (server: *wspp_server, connection: wspp_connection) -> void #c_call;
 on_message_server :: #type (server: *wspp_server, connection: wspp_connection, data: *u8, length: s64) -> void #c_call;
 
 wspp_server :: struct {
-    __empty_struct_padding: u8; // C++ makes empty structs have length 1
+    data: *void;
 }
 
+on_open_client :: #type (server: *wspp_client, connection: wspp_connection) -> void #c_call;
+on_close_client :: #type (server: *wspp_client, connection: wspp_connection) -> void #c_call;
 on_message_client :: #type (client: *wspp_client, data: *u8, length: s64) -> void #c_call;
 
 wspp_client :: struct {
-    __empty_struct_padding: u8; // C++ makes empty structs have length 1
+    data: *void;
 }
 
 wspp_message_type :: enum s32 {
@@ -55,9 +57,9 @@ wspp_server_create :: () -> *wspp_server #foreign websocketpp;
 
 wspp_server_free :: (server: *wspp_server) -> void #foreign websocketpp;
 
-wspp_server_set_open_handler :: (server: *wspp_server, handler: on_open) -> void #foreign websocketpp;
+wspp_server_set_open_handler :: (server: *wspp_server, handler: on_open_server) -> void #foreign websocketpp;
 
-wspp_server_set_close_handler :: (server: *wspp_server, handler: on_close) -> void #foreign websocketpp;
+wspp_server_set_close_handler :: (server: *wspp_server, handler: on_close_server) -> void #foreign websocketpp;
 
 wspp_server_set_message_handler :: (server: *wspp_server, handler: on_message_server) -> void #foreign websocketpp;
 
@@ -98,13 +100,13 @@ wspp_client_create :: () -> *wspp_client #foreign websocketpp;
 
 wspp_client_free :: (client: *wspp_client) -> void #foreign websocketpp;
 
+wspp_client_set_open_handler :: (client: *wspp_client, handler: on_open_client) -> void #foreign websocketpp;
+
+wspp_client_set_close_handler :: (client: *wspp_client, handler: on_close_client) -> void #foreign websocketpp;
+
 wspp_client_set_message_handler :: (client: *wspp_client, handler: on_message_client) -> void #foreign websocketpp;
 
 wspp_client_connect :: (client: *wspp_client, data: *u8, length: s64) -> bool #foreign websocketpp;
-
-wspp_client_stop_listening :: (client: *wspp_client) -> void #foreign websocketpp;
-
-wspp_client_is_listening :: (client: *wspp_client) -> bool #foreign websocketpp;
 
 wspp_client_run :: (client: *wspp_client) -> void #foreign websocketpp;
 

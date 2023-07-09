@@ -10,3 +10,4 @@ include_directories(asio-1.28.0/include)
 include_directories(websocketpp)
 
 add_library(websocketpp SHARED main.cpp main.h)
+#add_executable(websocketpp main.cpp main.h)

@@ -17,7 +17,7 @@ void wspp_server_free(wspp_server* server) {
     delete server;
 }
 
-void wspp_server_set_open_handler(wspp_server* server, on_open handler) {
+void wspp_server_set_open_handler(wspp_server* server, on_open_server handler) {
     server->server.set_open_handler([server, handler](websocketpp::connection_hdl handle) {
         unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
 
@@ -25,8 +25,8 @@ void wspp_server_set_open_handler(wspp_server* server, on_open handler) {
     });
 }
 
-void wspp_server_set_close_handler(wspp_server* server, on_close handler) {
-    server->server.set_open_handler([server, handler](websocketpp::connection_hdl handle) {
+void wspp_server_set_close_handler(wspp_server* server, on_close_server handler) {
+    server->server.set_close_handler([server, handler](websocketpp::connection_hdl handle) {
         unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
 
         handler(server, identifier);
@@ -129,6 +129,23 @@ void wspp_client_free(wspp_client* client) {
     delete client;
 }
 
+void wspp_client_set_open_handler(wspp_client* client, on_open_client handler) {
+    client->client.set_open_handler([client, handler](websocketpp::connection_hdl handle) {
+        unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
+
+        handler(client, identifier);
+    });
+
+}
+
+void wspp_client_set_close_handler(wspp_client* client, on_close_client handler) {
+    client->client.set_close_handler([client, handler](websocketpp::connection_hdl handle) {
+        unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
+
+        handler(client, identifier);
+    });
+}
+
 void wspp_client_set_message_handler(wspp_client* client, on_message_client handler) {
     client->client.set_message_handler([client, handler](websocketpp::connection_hdl handle, websocketpp::server<websocketpp::config::asio_client>::message_ptr msg) {
         const std::string& payload = msg->get_payload();
@@ -145,21 +162,18 @@ bool wspp_client_connect(wspp_client* client, char* data, long long length) {
     websocketpp::lib::error_code error;
     websocketpp::server<websocketpp::config::asio_client>::connection_ptr connection_ptr = client->client.get_connection(uri, error);
     if (!connection_ptr || error) {
+        if (error) {
+            std::cout << "Could not create connection because: " << error.message() << std::endl;
+        }
         return false;
     }
 
     unsigned long long identifier = reinterpret_cast<unsigned long long>(connection_ptr.get());
     client->connection = identifier;
 
+    client->client.connect(connection_ptr);
+
     return true;
-}
-
-void wspp_client_stop_listening(wspp_client* client) {
-    client->client.stop_listening();
-}
-
-bool wspp_client_is_listening(wspp_client* client) {
-    return client->client.is_listening();
 }
 
 void wspp_client_run(wspp_client* client) {
@@ -221,3 +235,17 @@ bool wspp_client_close(wspp_client* client, wspp_close_type code, char* reason_d
 }
 
 }
+
+//int main() {
+//    std::cout << "test" << std::endl;
+//
+//    websocketpp::server<websocketpp::config::asio> server;
+//    server.set_access_channels(websocketpp::log::alevel::all);
+//    server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+//    server.init_asio();
+//    server.listen(6060);
+//    server.start_accept();
+//    server.run();
+//
+//    return 0;
+//}

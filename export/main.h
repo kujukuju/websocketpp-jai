@@ -11,10 +11,10 @@
 #define EXPORT
 #endif
 
-#include "websocketpp/config/asio_no_tls.hpp"
-#include "websocketpp/config/asio_no_tls_client.hpp"
-#include "websocketpp/server.hpp"
-#include "websocketpp/client.hpp"
+// #include "websocketpp/config/asio_no_tls.hpp"
+// #include "websocketpp/config/asio_no_tls_client.hpp"
+// #include "websocketpp/server.hpp"
+// #include "websocketpp/client.hpp"
 
 extern "C" {
 
@@ -23,19 +23,23 @@ struct wspp_client;
 
 typedef unsigned long long wspp_connection;
 
-typedef void (*on_open)(wspp_server* server, wspp_connection connection);
-typedef void (*on_close)(wspp_server* server, wspp_connection connection);
+typedef void (*on_open_server)(wspp_server* server, wspp_connection connection);
+typedef void (*on_close_server)(wspp_server* server, wspp_connection connection);
 typedef void (*on_message_server)(wspp_server* server, wspp_connection connection, char* data, long long length);
 
 struct wspp_server {
-    websocketpp::server<websocketpp::config::asio> server;
+    void* data;
+    // websocketpp::server<websocketpp::config::asio> server;
 };
 
+typedef void (*on_open_client)(wspp_client* server, wspp_connection connection);
+typedef void (*on_close_client)(wspp_client* server, wspp_connection connection);
 typedef void (*on_message_client)(wspp_client* client, char* data, long long length);
 
 struct wspp_client {
-    websocketpp::client<websocketpp::config::asio_client> client;
-    wspp_connection connection;
+    void* data;
+    // websocketpp::client<websocketpp::config::asio_client> client;
+    // wspp_connection connection;
 };
 
 enum wspp_message_type {
@@ -73,9 +77,9 @@ EXPORT wspp_server* wspp_server_create();
 
 EXPORT void wspp_server_free(wspp_server* server);
 
-EXPORT void wspp_server_set_open_handler(wspp_server* server, on_open handler);
+EXPORT void wspp_server_set_open_handler(wspp_server* server, on_open_server handler);
 
-EXPORT void wspp_server_set_close_handler(wspp_server* server, on_close handler);
+EXPORT void wspp_server_set_close_handler(wspp_server* server, on_close_server handler);
 
 EXPORT void wspp_server_set_message_handler(wspp_server* server, on_message_server handler);
 
@@ -119,13 +123,13 @@ EXPORT wspp_client* wspp_client_create();
 
 EXPORT void wspp_client_free(wspp_client* client);
 
+EXPORT void wspp_client_set_open_handler(wspp_client* client, on_open_client handler);
+
+EXPORT void wspp_client_set_close_handler(wspp_client* client, on_close_client handler);
+
 EXPORT void wspp_client_set_message_handler(wspp_client* client, on_message_client handler);
 
 EXPORT bool wspp_client_connect(wspp_client* client, char* data, long long length);
-
-EXPORT void wspp_client_stop_listening(wspp_client* client);
-
-EXPORT bool wspp_client_is_listening(wspp_client* client);
 
 EXPORT void wspp_client_run(wspp_client* client);
 
