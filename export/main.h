@@ -11,10 +11,10 @@
 #define EXPORT
 #endif
 
-// #include "websocketpp/config/asio_no_tls.hpp"
-// #include "websocketpp/config/asio_no_tls_client.hpp"
-// #include "websocketpp/server.hpp"
-// #include "websocketpp/client.hpp"
+#include "websocketpp/config/asio_no_tls.hpp"
+#include "websocketpp/config/asio_no_tls_client.hpp"
+#include "websocketpp/server.hpp"
+#include "websocketpp/client.hpp"
 
 extern "C" {
 
@@ -29,7 +29,7 @@ typedef void (*on_message_server)(wspp_server* server, wspp_connection connectio
 
 struct wspp_server {
     void* data;
-    // websocketpp::server<websocketpp::config::asio> server;
+      websocketpp::server<websocketpp::config::asio> server;
 };
 
 typedef void (*on_open_client)(wspp_client* server, wspp_connection connection);
@@ -38,8 +38,8 @@ typedef void (*on_message_client)(wspp_client* client, char* data, long long len
 
 struct wspp_client {
     void* data;
-    // websocketpp::client<websocketpp::config::asio_client> client;
-    // wspp_connection connection;
+    wspp_connection connection;
+    websocketpp::client<websocketpp::config::asio_client> client;
 };
 
 enum wspp_message_type {
@@ -114,6 +114,8 @@ EXPORT void wspp_server_stop_perpetual(wspp_server* server);
 // send to all?
 
 EXPORT bool wspp_server_send(wspp_connection connection, char* data, long long length, wspp_message_type op);
+
+EXPORT long long wspp_server_get_connection_ip(wspp_connection connection, char* data, long long length);
 
 EXPORT bool wspp_server_close(wspp_connection connection, wspp_close_type code, char* reason_data, long long reason_length);
 

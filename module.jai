@@ -21,7 +21,8 @@ on_close_client :: #type (server: *wspp_client, connection: wspp_connection) -> 
 on_message_client :: #type (client: *wspp_client, data: *u8, length: s64) -> void #c_call;
 
 wspp_client :: struct {
-    data: *void;
+    data:       *void;
+    connection: wspp_connection;
 }
 
 wspp_message_type :: enum s32 {
@@ -93,6 +94,8 @@ wspp_server_stop_perpetual :: (server: *wspp_server) -> void #foreign websocketp
 
 // send to all?
 wspp_server_send :: (connection: wspp_connection, data: *u8, length: s64, op: wspp_message_type) -> bool #foreign websocketpp;
+
+wspp_server_get_connection_ip :: (connection: wspp_connection, data: *u8, length: s64) -> s64 #foreign websocketpp;
 
 wspp_server_close :: (connection: wspp_connection, code: wspp_close_type, reason_data: *u8, reason_length: s64) -> bool #foreign websocketpp;
 

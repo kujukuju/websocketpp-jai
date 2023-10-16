@@ -9,6 +9,7 @@ wspp_server* wspp_server_create() {
 
     server->server.init_asio();
     server->server.clear_access_channels(websocketpp::log::alevel::all);
+    server->server.set_error_channels(websocketpp::log::elevel::none);
 
     return server;
 }
@@ -102,6 +103,20 @@ bool wspp_server_send(wspp_connection connection, char* data, long long length, 
     return !error;
 }
 
+long long wspp_server_get_connection_ip(wspp_connection connection, char* data, long long length) {
+    if (!connection) {
+        return 0;
+    }
+
+    websocketpp::server<websocketpp::config::asio>::connection_type* connection_ptr = reinterpret_cast<websocketpp::server<websocketpp::config::asio>::connection_type*>(connection);
+    const std::string& host = connection_ptr->get_host();
+
+    long long allocation_size = std::min((long long) length, (long long) host.size());
+    std::memcpy(data, host.data(), allocation_size);
+
+    return allocation_size;
+}
+
 bool wspp_server_close(wspp_connection connection, wspp_close_type code, char* reason_data, long long reason_length) {
     websocketpp::server<websocketpp::config::asio>::connection_type* connection_ptr = reinterpret_cast<websocketpp::server<websocketpp::config::asio>::connection_type*>(connection);
 
@@ -121,6 +136,16 @@ wspp_client* wspp_client_create() {
 
     client->client.init_asio();
     client->client.clear_access_channels(websocketpp::log::alevel::all);
+    client->client.set_error_channels(websocketpp::log::elevel::none);
+
+    client->client.set_open_handler([client](websocketpp::connection_hdl handle) {
+        unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
+        client->connection = identifier;
+    });
+
+    client->client.set_close_handler([client](websocketpp::connection_hdl handle) {
+        client->connection = 0;
+    });
 
     return client;
 }
@@ -132,6 +157,7 @@ void wspp_client_free(wspp_client* client) {
 void wspp_client_set_open_handler(wspp_client* client, on_open_client handler) {
     client->client.set_open_handler([client, handler](websocketpp::connection_hdl handle) {
         unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
+        client->connection = identifier;
 
         handler(client, identifier);
     });
@@ -141,6 +167,7 @@ void wspp_client_set_open_handler(wspp_client* client, on_open_client handler) {
 void wspp_client_set_close_handler(wspp_client* client, on_close_client handler) {
     client->client.set_close_handler([client, handler](websocketpp::connection_hdl handle) {
         unsigned long long identifier = reinterpret_cast<unsigned long long>(handle.lock().get());
+        client->connection = 0;
 
         handler(client, identifier);
     });
@@ -167,9 +194,6 @@ bool wspp_client_connect(wspp_client* client, char* data, long long length) {
         }
         return false;
     }
-
-    unsigned long long identifier = reinterpret_cast<unsigned long long>(connection_ptr.get());
-    client->connection = identifier;
 
     client->client.connect(connection_ptr);
 
