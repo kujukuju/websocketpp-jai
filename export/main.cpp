@@ -109,7 +109,7 @@ long long wspp_server_get_connection_ip(wspp_connection connection, char* data, 
     }
 
     websocketpp::server<websocketpp::config::asio>::connection_type* connection_ptr = reinterpret_cast<websocketpp::server<websocketpp::config::asio>::connection_type*>(connection);
-    const std::string& host = connection_ptr->get_host();
+    const std::string& host = connection_ptr->get_remote_endpoint();
 
     long long allocation_size = std::min((long long) length, (long long) host.size());
     std::memcpy(data, host.data(), allocation_size);

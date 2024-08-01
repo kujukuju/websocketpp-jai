@@ -9,8 +9,19 @@
     using opts: Generate_Bindings_Options;
     array_add(*system_include_paths, GENERATOR_DEFAULT_SYSTEM_INCLUDE_PATH);
 
-    array_add(*libpaths, "bin/win");
-    array_add(*libnames, "websocketpp");
+    #if OS == .WINDOWS {
+        array_add(*libpaths, "bin/win");
+        array_add(*libnames, "websocketpp");
+
+        array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\ucrt");
+        array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\um");
+        array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\shared");
+        array_add(*system_include_paths, "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\include");
+    } else #if OS == .LINUX {
+        array_add(*libpaths, "bin/linux");
+        array_add(*libnames, "libwebsocketpp");
+    }
+
     // files := file_list(tprint("%websocketpp-jai/export/websocketpp/websocketpp", #filepath));
     // defer array_free(files);
     // for file: files {
@@ -26,11 +37,6 @@
     // array_add(*extra_clang_arguments, "-D_GLIBCXX_USE_NANOSLEEP", "-DNO_VALIDATE", "-DASIO_STANDALONE", "-DENABLE_CPP11=TRUE", "-D_USE_MATH_DEFINES");
     array_add(*extra_clang_arguments, "-x", "c++");
     generate_compile_time_struct_checks = false;
-
-    array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\ucrt");
-    array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\um");
-    array_add(*system_include_paths, "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.22621.0\\shared");
-    array_add(*system_include_paths, "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\include");
 
     generate_bindings(opts, "module.jai");
 }

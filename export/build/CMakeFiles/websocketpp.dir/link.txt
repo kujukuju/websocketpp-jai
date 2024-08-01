@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libwebsocketpp.so -o libwebsocketpp.so CMakeFiles/websocketpp.dir/main.cpp.o 

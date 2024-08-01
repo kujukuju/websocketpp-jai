@@ -11,10 +11,10 @@
 #define EXPORT
 #endif
 
-#include "websocketpp/config/asio_no_tls.hpp"
-#include "websocketpp/config/asio_no_tls_client.hpp"
-#include "websocketpp/server.hpp"
-#include "websocketpp/client.hpp"
+// #include "websocketpp/config/asio_no_tls.hpp"
+// #include "websocketpp/config/asio_no_tls_client.hpp"
+// #include "websocketpp/server.hpp"
+// #include "websocketpp/client.hpp"
 
 extern "C" {
 
@@ -29,7 +29,7 @@ typedef void (*on_message_server)(wspp_server* server, wspp_connection connectio
 
 struct wspp_server {
     void* data;
-      websocketpp::server<websocketpp::config::asio> server;
+    //   websocketpp::server<websocketpp::config::asio> server;
 };
 
 typedef void (*on_open_client)(wspp_client* server, wspp_connection connection);
@@ -39,7 +39,7 @@ typedef void (*on_message_client)(wspp_client* client, char* data, long long len
 struct wspp_client {
     void* data;
     wspp_connection connection;
-    websocketpp::client<websocketpp::config::asio_client> client;
+    // websocketpp::client<websocketpp::config::asio_client> client;
 };
 
 enum wspp_message_type {

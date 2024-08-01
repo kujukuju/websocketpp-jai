@@ -1,0 +1,3 @@
+/mnt/c/Users/Kuju/Projects/websocketpp-jai/export/build/CMakeFiles/websocketpp.dir
+/mnt/c/Users/Kuju/Projects/websocketpp-jai/export/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Kuju/Projects/websocketpp-jai/export/build/CMakeFiles/rebuild_cache.dir

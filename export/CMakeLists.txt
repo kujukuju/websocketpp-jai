@@ -9,5 +9,5 @@ add_definitions(-D_GLIBCXX_USE_NANOSLEEP -DNO_VALIDATE -DASIO_STANDALONE -DENABL
 include_directories(asio-1.28.0/include)
 include_directories(websocketpp)
 
-add_library(websocketpp SHARED main.cpp main.h)
+add_library(websocketpp SHARED main.cpp)
 #add_executable(websocketpp main.cpp main.h)
