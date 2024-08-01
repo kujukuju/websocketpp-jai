@@ -133,4 +133,8 @@ wspp_client_close :: (client: *wspp_client, code: wspp_close_type, reason_data: 
 
 #scope_file
 
-libwebsocketpp :: #library "bin/linux/libwebsocketpp";
+#if OS == .WINDOWS {
+    libwebsocketpp :: #library "bin/win/websocketpp";
+} else #if OS == .LINUX {
+    libwebsocketpp :: #library "bin/linux/libwebsocketpp";
+}
